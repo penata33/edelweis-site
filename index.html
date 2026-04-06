@@ -589,8 +589,7 @@ function buildOrderNotes(uploadInfo) {
   if (uploadInfo && uploadInfo.path) lines.push('Снимка (storage path): ' + uploadInfo.path);
   if (uploadInfo && uploadInfo.publicUrl) lines.push('Снимка (public URL): ' + uploadInfo.publicUrl);
   return lines.join('\n');
-}
-async function submitOrderToSupabase() {
+}async function submitOrderToSupabase() {
   var prod = S.product;
   var uploadInfo = await uploadOrderImage(prod);
 
@@ -631,8 +630,6 @@ async function submitOrderToSupabase() {
     status: 'new'
   };
 
-  console.log('PAYLOAD TO SUPABASE:', payload);
-
   var insertRes = await supabaseClient
     .from(SUPABASE_TABLE)
     .insert([payload]);
@@ -640,8 +637,6 @@ async function submitOrderToSupabase() {
   if (insertRes.error) throw insertRes.error;
   return true;
 }
-  };
-  
 
 // ── PRICE ──
 function calcTotal() {
