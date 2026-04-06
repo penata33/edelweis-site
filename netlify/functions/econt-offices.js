@@ -1,4 +1,4 @@
-et cachedOffices = null;
+let cachedOffices = null;
 let cachedAt = 0;
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const ECONT_OFFICES_URL = 'https://ee.econt.com/services/Nomenclatures/NomenclaturesService.getOffices.json';
@@ -9,9 +9,20 @@ async function loadOffices() {
     return cachedOffices;
   }
 
-  const response = await fetch(ECONT_OFFICES_URL);
+  const response = await fetch(ECONT_OFFICES_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      countryCode: 'BGR'
+    })
+  });
+
   if (!response.ok) {
-    throw new Error('Econt offices request failed with status ' + response.status);
+    const text = await response.text().catch(() => '');
+    throw new Error('Econt offices request failed with status ' + response.status + (text ? ' - ' + text.slice(0, 300) : ''));
   }
 
   const data = await response.json();
@@ -37,9 +48,16 @@ function normalizeOffice(office) {
     name: office.name || '',
     city,
     quarter,
-    addr: fullAddress,
+    addr: (fullAddress || '').trim(),
     type: office.isAPS ? 'Еконтомат' : 'Офис'
   };
+}
+
+function isRealOffice(office) {
+  const code = String(office.code || '');
+  // Filter obvious demo/test offices that appear in some example datasets.
+  if (code === '99999999' || code === '999999999' || code === '888888888') return false;
+  return true;
 }
 
 exports.handler = async function(event) {
@@ -67,6 +85,7 @@ exports.handler = async function(event) {
     const offices = await loadOffices();
 
     const filtered = offices
+      .filter(isRealOffice)
       .map(normalizeOffice)
       .filter(function(office) {
         const haystack = [
