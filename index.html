@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+
+<html lang="bg">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edelweiss Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&amp;family=Jost:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--gd:#3a5c42;--gm:#4a7a58;--gs:#6b9a7a;--cr:#faf8f4;--go:#b8924a;--wh:#fff;--bd:#d0c8bc;--mu:#8a7e72;--dk:#1a2a1e;--sh:0 4px 24px rgba(30,46,34,.09);--er:#c0392b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#faf8f4;font-family:'Jost',sans-serif;color:var(--dk);min-height:100vh}
+.header{text-align:center;padding:44px 24px 28px}
+.logo-wrap{margin-bottom:16px}
+.logo-wrap img{width:100px;height:auto;display:inline-block}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.8vw,24px);font-weight:500;letter-spacing:7px;text-transform:uppercase;color:var(--gd);margin-bottom:6px}
+.header-tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(24px,4.5vw,38px);font-weight:300;color:var(--gm)}
+.header-line{width:70px;height:1px;background:linear-gradient(to right,transparent,var(--go),transparent);margin:14px auto 0}
+.progress-wrap{max-width:640px;margin:0 auto 28px;padding:0 24px}
+.progress-steps{display:flex;align-items:center;justify-content:center}
+.step-dot{display:flex;flex-direction:column;align-items:center;gap:5px}
+.step-dot .dot{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--mu);transition:all .4s}
+.step-dot.active .dot{background:var(--gd);border-color:var(--gd);color:#fff;box-shadow:0 0 0 5px rgba(58,92,66,.12)}
+.step-dot.done .dot{background:var(--go);border-color:var(--go);color:#fff}
+.step-dot .label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);font-weight:500;white-space:nowrap;display:none}
+.step-dot.active .label{color:var(--gd);display:block}
+.step-line{flex:1;height:1px;background:var(--bd);max-width:52px;margin-bottom:20px;transition:background .4s}
+.step-line.done{background:var(--go)}
+.card{max-width:860px;margin:0 auto 70px;padding:0 18px}
+#step-4,#step-5,#step-6{max-width:860px;margin:0 auto 70px;padding:0 18px}
+.step-panel{display:none;animation:fadeUp .4s ease forwards}
+.step-panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.panel-inner{background:rgba(255,255,255,.96);border-radius:22px;padding:40px 38px;box-shadow:var(--sh);border:1px solid var(--bd);position:relative;overflow:hidden}
+.panel-inner::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,var(--gs),var(--gd),var(--go));border-radius:22px 22px 0 0}
+.panel-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--dk);margin-bottom:5px}
+.panel-subtitle{font-size:13px;color:var(--mu);font-weight:300;margin-bottom:26px;line-height:1.6}
+/* OCCASION */
+.occasion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+@media(max-width:560px){.occasion-grid{grid-template-columns:repeat(2,1fr)}}
+.occasion-btn{background:rgba(255,255,255,.8);border:1.5px solid var(--bd);border-radius:14px;padding:15px 10px;cursor:pointer;text-align:center;transition:all .22s}
+.occasion-btn:hover{border-color:var(--gm);background:#f0f5f1;transform:translateY(-2px)}
+.occasion-btn.selected{border-color:var(--gd);background:linear-gradient(135deg,#eef4ef,#e5efe7);box-shadow:0 4px 14px rgba(58,92,66,.14)}
+.occasion-icon{font-size:26px;margin-bottom:7px;display:block}
+.occasion-label{font-size:13px;font-weight:500;color:var(--dk)}
+.divider-text{text-align:center;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mu);margin:14px 0;position:relative}
+.divider-text::before,.divider-text::after{content:'';position:absolute;top:50%;width:calc(50% - 36px);height:1px;background:var(--bd)}
+.divider-text::before{left:0}.divider-text::after{right:0}
+/* INPUTS */
+.input-field{width:100%;padding:13px 16px;border:1.5px solid var(--bd);border-radius:12px;font-family:'Jost',sans-serif;font-size:14px;color:var(--dk);background:var(--cr);outline:none;transition:all .22s}
+.input-field:focus{border-color:var(--gm);background:#fff;box-shadow:0 0 0 4px rgba(74,122,88,.1)}
+.input-field::placeholder{color:#b0a498}
+.input-field.invalid{border-color:var(--er)!important;background:#fff5f4!important;box-shadow:0 0 0 3px rgba(192,57,43,.12)!important}
+textarea.input-field{resize:vertical;min-height:88px}
+.label-text{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);font-weight:600;margin-bottom:8px}
+.field-group{margin-bottom:18px}
+.hint-text{font-size:11.5px;color:var(--mu);font-weight:300;margin-top:7px;line-height:1.5}
+.field-error{font-size:12px;color:var(--er);margin-top:5px;display:none}
+.field-error.show{display:block}
+/* PRODUCT GRID */
+.step2-header{text-align:center;margin-bottom:28px}
+.step2-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;color:var(--dk)}
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto auto auto 1fr auto;border:1px solid #d0c8bc;border-radius:16px;overflow:hidden;background:#fff}
+@media(max-width:640px){.product-grid{grid-template-columns:1fr;grid-template-rows:auto}}
+.product-card{display:grid;grid-template-rows:subgrid;grid-row:span 6;cursor:pointer;transition:background .25s;background:#fff;position:relative;border-right:1px solid #d0c8bc;text-align:center;align-items:start}
+.product-card:last-child{border-right:none}
+.product-card:hover{background:#f5faf6}
+.product-card.selected{background:linear-gradient(180deg,#f0f7f2,#fff)}
+.product-card.selected::after{content:'✓';position:absolute;top:12px;right:14px;width:24px;height:24px;background:var(--gd);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.pc-band-img{padding:24px 18px 0;display:flex;align-items:center;justify-content:center;min-height:250px}
+.pc-band-img img{width:100%;max-width:200px;height:220px;display:block;object-fit:cover;border-radius:14px;box-shadow:0 4px 18px rgba(30,46,34,.13)}
+.pc-band-name{padding:16px 20px 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pc-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;font-style:italic;color:var(--gd);line-height:1.2;text-align:center}
+.pc-bestseller{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--go);font-weight:300;text-align:center}
+.pc-band-feat{padding:12px 20px 0}
+.pc-features{list-style:none}
+.pc-features li{font-family:'Jost',sans-serif;font-size:14px;color:#1a1a1a;font-weight:400;line-height:1.7;text-align:center}
+.pc-band-sec{padding:8px 20px 0}
+.pc-sec-label{font-family:'Jost',sans-serif;font-size:14px;font-weight:700;color:var(--gd);margin-bottom:4px;text-align:center}
+.pc-sec-list{list-style:none}
+.pc-sec-list li{font-family:'Jost',sans-serif;font-size:13.5px;color:#1a1a1a;font-weight:400;line-height:1.7;text-align:center}
+.pc-band-price{padding:16px 20px;display:flex;align-items:flex-end;justify-content:center}
+.pc-price{display:inline-block;border:1.5px solid var(--gd);border-radius:100px;padding:8px 30px;font-family:'Jost',sans-serif;font-size:20px;color:var(--gd);font-weight:500}
+.pc-band-addons{padding:0 20px 24px;border-top:1px solid #e0d8d0;padding-top:12px}
+.pc-addon-label{font-family:'Jost',sans-serif;font-size:14px;font-weight:700;color:var(--gd);text-align:center;margin-bottom:2px}
+.pc-addon-sub{font-family:'Jost',sans-serif;font-size:13px;color:#444;font-weight:400;text-align:center;margin-bottom:6px}
+/* STEP 3 */
+.custom-block{margin-bottom:24px}
+.custom-block-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--dk);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.addon-price{font-size:13px;color:var(--go);font-weight:400;font-family:'Jost'}
+.radio-pills{display:flex;flex-wrap:wrap;gap:8px}
+.radio-pill,.toggle-pill{padding:9px 17px;border:1.5px solid var(--bd);border-radius:100px;font-size:13px;cursor:pointer;transition:all .2s;background:var(--cr);font-family:'Jost',sans-serif;font-weight:400;color:var(--dk);user-select:none}
+.radio-pill:hover{border-color:var(--gm)}
+.radio-pill.selected{background:var(--gd);border-color:var(--gd);color:#fff}
+.toggle-pill:hover{border-color:var(--go)}
+.toggle-pill.selected{background:var(--go);border-color:var(--go);color:#fff}
+/* Material display cards */
+.material-card{border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;margin-top:14px;display:none;background:#fff}
+.material-card.show{display:block}
+.material-card img{width:100%;height:auto;display:block;object-fit:cover}
+.material-card-body{padding:18px 20px}
+.material-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--dk);margin-bottom:8px}
+.material-card-text{font-size:13px;color:var(--mu);font-weight:300;line-height:1.7}
+/* Swatch strip */
+.swatch-strip{width:100%;border-radius:12px;display:block;margin-bottom:12px;border:1px solid var(--bd)}
+/* Color number */
+.color-input-row{display:flex;gap:12px;align-items:flex-start;margin-top:10px}
+.color-num-field{width:80px;padding:11px 14px;border:1.5px solid var(--bd);border-radius:12px;font-family:'Jost',sans-serif;font-size:16px;font-weight:500;color:var(--dk);background:var(--cr);outline:none;text-align:center;transition:all .22s}
+.color-num-field:focus{border-color:var(--gm);background:#fff;box-shadow:0 0 0 4px rgba(74,122,88,.1)}
+.color-num-field.invalid{border-color:var(--er)!important;background:#fff5f4!important;box-shadow:0 0 0 3px rgba(192,57,43,.12)!important}
+.color-hint{font-size:12.5px;color:var(--mu);font-weight:300;line-height:1.6;padding-top:4px}
+/* Upload */
+.upload-area{border:2px dashed var(--bd);border-radius:14px;padding:26px 20px;text-align:center;cursor:pointer;transition:all .22s;background:var(--cr);position:relative}
+.upload-area:hover{border-color:var(--gm);background:#f0f5f1}
+.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:30px;margin-bottom:9px;display:block}
+.upload-text{font-size:13px;color:var(--mu);font-weight:300;line-height:1.6}
+.upload-text strong{color:var(--gd);font-weight:600}
+.upload-preview{margin-top:10px;font-size:13px;color:var(--gd);font-weight:500;display:none}
+.engrave-wrap{display:none;margin-top:12px}
+.engrave-wrap.show{display:block}
+/* DATE */
+.date-notice{font-size:12.5px;font-weight:300;margin-top:7px;line-height:1.5}
+.premium-date-box{border:1.5px solid var(--go);border-radius:14px;padding:18px 20px;margin-top:16px;background:linear-gradient(135deg,#fdf8ee,#faf4e4);display:none}
+.premium-date-box.show{display:block}
+.premium-date-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--dk);margin-bottom:6px}
+.premium-date-text{font-size:13px;color:var(--mu);font-weight:300;line-height:1.6;margin-bottom:12px}
+.premium-date-text strong{color:var(--go);font-weight:600}
+.prem-pill{padding:9px 17px;border:1.5px solid var(--go);border-radius:100px;font-size:13px;cursor:pointer;transition:all .2s;background:#fff;font-family:'Jost',sans-serif;font-weight:400;color:var(--dk);user-select:none;display:inline-block;margin-right:8px;margin-bottom:8px}
+.prem-pill:hover{background:#fdf0d8}
+.prem-pill.selected{background:var(--go);border-color:var(--go);color:#fff}
+/* DELIVERY */
+.delivery-type-pills{display:flex;gap:10px;margin-bottom:18px}
+.del-pill{flex:1;padding:14px 10px;border:1.5px solid var(--bd);border-radius:14px;cursor:pointer;text-align:center;background:var(--cr);transition:all .22s}
+.del-pill:hover{border-color:var(--gm)}
+.del-pill.selected{border-color:var(--gd);background:linear-gradient(135deg,#eef4ef,#e5efe7);box-shadow:0 4px 14px rgba(58,92,66,.13)}
+.del-pill-icon{font-size:22px;margin-bottom:6px;display:block}
+.del-pill-label{font-size:13px;font-weight:600;color:var(--dk)}
+.del-pill-sub{font-size:11px;color:var(--mu);font-weight:300;margin-top:2px}
+.courier-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.courier-btn{border:1.5px solid var(--bd);border-radius:12px;padding:15px 10px;cursor:pointer;text-align:center;background:var(--cr);transition:all .22s}
+.courier-btn:hover{border-color:var(--gm)}
+.courier-btn.selected{border-color:var(--gd);background:linear-gradient(135deg,#eef4ef,#e5efe8);box-shadow:0 4px 12px rgba(58,92,66,.13)}
+.courier-icon{font-size:20px;margin-bottom:5px;display:block}
+.courier-name{font-size:13px;font-weight:500;color:var(--dk)}
+.office-search-wrap{position:relative}
+.office-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--bd);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:100;max-height:260px;overflow-y:auto;display:none;margin-top:4px}
+.office-result-item{padding:11px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid #f0ece4;transition:background .15s}
+.office-result-item:last-child{border-bottom:none}
+.office-result-item:hover{background:#f5faf6}
+.o-city{font-weight:700;color:var(--gd);font-size:13px}
+.o-quarter{font-size:11px;color:var(--go);margin-top:1px}
+.o-addr{color:var(--mu);font-size:12px;margin-top:2px}
+.o-type-tag{display:inline-block;font-size:9px;color:#fff;background:var(--gm);border-radius:4px;padding:1px 6px;margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.no-results{padding:14px 16px;font-size:13px;color:var(--mu);text-align:center}
+/* SUMMARY */
+.summary-box{background:var(--cr);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:20px}
+.summary-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.summary-row:last-child{border-bottom:none}
+.summary-key{color:var(--mu)}
+.summary-val{color:var(--dk);font-weight:500;text-align:right;max-width:60%}
+.summary-total-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px;border-top:2px solid var(--bd);margin-top:4px}
+.summary-total-key{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--dk)}
+.summary-total-val{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gd)}
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:26px;justify-content:flex-end}
+.btn-back{padding:12px 22px;border:1.5px solid var(--bd);border-radius:100px;background:transparent;color:var(--mu);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;font-weight:500}
+.btn-back:hover{border-color:var(--mu);color:var(--dk)}
+.btn-next{padding:12px 30px;border:none;border-radius:100px;background:linear-gradient(135deg,var(--gm),var(--gd));color:#fff;font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;font-weight:500;letter-spacing:.4px;transition:all .3s;box-shadow:0 4px 16px rgba(58,92,66,.3)}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(58,92,66,.38)}
+.error-msg{background:#fff5f3;border:1px solid #f0c0b0;color:#b04030;border-radius:10px;padding:10px 15px;font-size:13px;margin-top:14px;display:none}
+.error-msg.show{display:block}
+/* SUCCESS */
+.success-panel{text-align:center;padding:20px 0}
+.success-icon{font-size:56px;margin-bottom:18px;display:block;animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) forwards}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;color:var(--dk);margin-bottom:12px;line-height:1.4}
+.success-text{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--mu);line-height:1.8;font-weight:300;max-width:440px;margin:0 auto}
+.success-divider{width:60px;height:1px;background:linear-gradient(to right,transparent,var(--go),transparent);margin:18px auto}
+.success-brand{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gd);margin-top:22px;letter-spacing:4px;text-transform:uppercase;font-weight:500}
+/* CONFIRM MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:24px;padding:44px 40px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center;position:relative;animation:modalIn .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes modalIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-flower{font-size:42px;margin-bottom:16px;display:block}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--dk);margin-bottom:14px;line-height:1.3}
+.modal-text{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--mu);font-weight:300;line-height:1.8;margin-bottom:28px}
+.modal-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.modal-btn-confirm{padding:13px 32px;border:none;border-radius:100px;background:linear-gradient(135deg,var(--gm),var(--gd));color:#fff;font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;font-weight:600;letter-spacing:.4px;transition:all .3s;box-shadow:0 4px 16px rgba(58,92,66,.3)}
+.modal-btn-confirm:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(58,92,66,.4)}
+.modal-btn-back{padding:13px 24px;border:1.5px solid var(--bd);border-radius:100px;background:transparent;color:var(--mu);font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;font-weight:500;transition:all .2s}
+.modal-btn-back:hover{border-color:var(--gd);color:var(--gd)}
+@media(max-width:500px){.panel-inner{padding:24px 16px}.modal-box{padding:32px 24px}}
+</style>
+</head>
+<body>
+<div class="header"><div class="logo-wrap"><img alt="Edelweiss Studio" src="assets/edelweiss-studio-logo.png"/></div><div class="brand-name">Edelweiss Studio</div><div class="header-tagline">Жестът, който винаги ще помнят…</div><div class="header-line"></div></div>
+<div class="progress-wrap"><div class="progress-steps">
+<div class="step-dot active" id="dot-1"><div class="dot">1</div><div class="label">Повод</div></div>
+<div class="step-line" id="line-1"></div>
+<div class="step-dot" id="dot-2"><div class="dot">2</div><div class="label">Продукт</div></div>
+<div class="step-line" id="line-2"></div>
+<div class="step-dot" id="dot-3"><div class="dot">3</div><div class="label">Детайли</div></div>
+<div class="step-line" id="line-3"></div>
+<div class="step-dot" id="dot-4"><div class="dot">4</div><div class="label">Дата</div></div>
+<div class="step-line" id="line-4"></div>
+<div class="step-dot" id="dot-5"><div class="dot">5</div><div class="label">Доставка</div></div>
+<div class="step-line" id="line-5"></div>
+<div class="step-dot" id="dot-6"><div class="dot">✓</div><div class="label">Готово</div></div>
+</div></div>
+<div class="card">
+<div class="step-panel active" id="step-1"><div class="panel-inner">
+<div class="panel-title">За какъв повод е картичката?</div>
+<div class="panel-subtitle">Изберете от предложените поводи или опишете своя</div>
+<div class="occasion-grid">
+<div class="occasion-btn" data-val="Сватба" onclick="selectOccasion(this)"><span class="occasion-icon">💍</span><div class="occasion-label">Сватба</div></div>
+<div class="occasion-btn" data-val="Рожден ден" onclick="selectOccasion(this)"><span class="occasion-icon">🎂</span><div class="occasion-label">Рожден ден</div></div>
+<div class="occasion-btn" data-val="Абитуриентски бал" onclick="selectOccasion(this)"><span class="occasion-icon">🎓</span><div class="occasion-label">Абитуриентски бал</div></div>
+<div class="occasion-btn" data-val="Юбилей" onclick="selectOccasion(this)"><span class="occasion-icon">🥂</span><div class="occasion-label">Юбилей</div></div>
+<div class="occasion-btn" data-val="Кръщене" onclick="selectOccasion(this)"><span class="occasion-icon">👶</span><div class="occasion-label">Кръщене</div></div>
+<div class="occasion-btn" data-val="Свети Валентин" onclick="selectOccasion(this)"><span class="occasion-icon">❤️</span><div class="occasion-label">Свети Валентин</div></div>
+<div class="occasion-btn" data-val="Имен ден" onclick="selectOccasion(this)"><span class="occasion-icon">💚</span><div class="occasion-label">Имен ден</div></div>
+<div class="occasion-btn" data-val="Годишнина" onclick="selectOccasion(this)"><span class="occasion-icon">🌹</span><div class="occasion-label">Годишнина</div></div>
+</div>
+<div class="divider-text">или</div>
+<div class="field-group">
+<label class="label-text">Опишете повода с Ваши думи</label>
+<textarea class="input-field" id="custom-occasion" oninput="onCustomOccasion()" placeholder="Например: изпращане на колега, специален момент..."></textarea>
+</div>
+<div class="error-msg" id="err-1">Моля, изберете или опишете повода</div>
+<div class="btn-row"><button class="btn-next" onclick="goToStep(2)">Продължи →</button></div>
+</div></div>
+<div class="step-panel" id="step-2"><div class="panel-inner"><div class="step2-header"><div class="step2-title">Направете Вашия избор</div></div><div class="product-grid"><div class="product-card" data-product="neshen" onclick="selectProduct(this,'neshen')"><div class="pc-band-img"><img alt="Нежен Спомен" src="assets/product-nezhen-spomen.png" style="width:160px;height:200px;display:block;object-fit:cover;border-radius:50%;box-shadow:0 4px 18px rgba(30,46,34,.13);margin:0 auto;"/></div><div class="pc-band-name"><div class="pc-name">Нежен Спомен</div></div><div class="pc-band-feat"><ul class="pc-features"><li>Велурен Плик</li><li>Персонализиран текст</li><li>Восъчен печат</li><li>Размер С6</li><li>Подходящ за пари</li></ul></div><div class="pc-band-sec"></div><div class="pc-band-price"><div class="pc-price">€17.50</div></div><div class="pc-band-addons"><div class="pc-addon-label">Гравиране на плика</div><div class="pc-addon-sub">от €4.00</div></div></div><div class="product-card" data-product="vechen" onclick="selectProduct(this,'vechen')"><div class="pc-band-img"><img alt="Вечен Жест" src="assets/product-vechen-zhest.png" style="width:160px;height:200px;display:block;object-fit:cover;border-radius:50%;box-shadow:0 4px 18px rgba(30,46,34,.13);margin:0 auto;"/></div><div class="pc-band-name"><div class="pc-name">Вечен Жест</div><div class="pc-bestseller">— най-поръчваният ни спомен —</div></div><div class="pc-band-feat"><ul class="pc-features"><li>Велур / лен</li><li>Персонализиран текст и дизайн</li></ul></div><div class="pc-band-sec"><div class="pc-sec-label">Според повода:</div><ul class="pc-sec-list"><li>пожелание</li><li>покана</li><li>пожелание + плик</li><li>пожелание + снимка</li></ul></div><div class="pc-band-price"><div class="pc-price">€39.50</div></div><div class="pc-band-addons"><div class="pc-addon-label">Гравиране на корицата</div><div class="pc-addon-sub">от €4.00</div></div></div><div class="product-card" data-product="nasledstvo" onclick="selectProduct(this,'nasledstvo')"><div class="pc-band-img"><img alt="Наследство" src="assets/product-nasledstvo.png" style="width:160px;height:200px;display:block;object-fit:cover;border-radius:50%;box-shadow:0 4px 18px rgba(30,46,34,.13);margin:0 auto;"/></div><div class="pc-band-name"><div class="pc-name">Наследство</div></div><div class="pc-band-feat"><ul class="pc-features"><li>Кожа</li><li>Персонализиран текст и дизайн</li></ul></div><div class="pc-band-sec"><div class="pc-sec-label">Според повода:</div><ul class="pc-sec-list"><li>пожелание</li><li>покана</li><li>пожелание + плик</li><li>пожелание + снимка</li></ul></div><div class="pc-band-price"><div class="pc-price">€48.50</div></div></div></div><div class="error-msg" id="err-2">Моля, изберете продукт</div>
+<div class="btn-row"><button class="btn-back" onclick="goToStep(1)">← Назад</button><button class="btn-next" onclick="goToStep(3)">Продължи →</button></div>
+</div></div><div class="step-panel" id="step-3"><div class="panel-inner"><div class="panel-title">Персонализирайте</div><div class="panel-subtitle">Изберете цвят, текст и допълнителни опции</div>
+<div id="custom-neshen" style="display:none">
+<div class="custom-block">
+<div class="custom-block-title">Изберете Вашия цвят</div>
+<img alt="Цветове велур" class="swatch-strip" src="assets/colors-velur.jpg"/>
+<div class="color-input-row">
+<input class="color-num-field" id="color-neshen" max="13" min="1" placeholder="№" type="number"/>
+<div class="color-hint">Въведете номера на желания цвят от палитрата (1–13)</div>
+</div>
+<div class="field-error" id="err-color-neshen">Моля, въведете номер на цвят (1–13)</div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Текст за картичката</div>
+<textarea class="input-field" id="text-neshen" placeholder="Напишете пожеланието или текста, който искате да присъства..."></textarea>
+<div class="field-error" id="err-text-neshen">Моля, напишете текст за картичката</div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Гравиране на плика</div>
+<div class="radio-pills">
+<div class="toggle-pill" id="eng-n-yes" onclick="toggleEngrave('n',true)">Да, искам гравиране</div>
+<div class="toggle-pill" id="eng-n-no" onclick="toggleEngrave('n',false)">Без гравиране</div>
+</div>
+<div class="engrave-wrap" id="eng-field-n">
+<label class="label-text" style="margin-top:12px">Изберете текст за гравиране</label>
+<select class="input-field" id="eng-text-n" onchange="updateTotal()">
+<option value="">— Изберете —</option>
+<option value="Честито завършване" data-price="6.99">Честито завършване (+€6.99)</option>
+<option value="Честита сватба" data-price="6.99">Честита сватба (+€6.99)</option>
+<option value="Честито кръщение" data-price="6.99">Честито кръщение (+€6.99)</option>
+<option value="Честито" data-price="4.00">Честито (+€4.00)</option>
+<option value="Честит Рожден Ден" data-price="8.99">Честит Рожден Ден (+€8.99)</option>
+<option value="Честит Имен Ден" data-price="8.99">Честит Имен Ден (+€8.99)</option>
+</select>
+</div>
+</div>
+</div>
+<div id="custom-vechen" style="display:none">
+<div class="custom-block">
+<div class="custom-block-title">Изберете материал</div>
+<div class="radio-pills" style="margin-bottom:14px">
+<div class="radio-pill" id="mat-vechen-velur" onclick="selectMaterial('vechen','velur')">Велур</div>
+<div class="radio-pill" id="mat-vechen-len" onclick="selectMaterial('vechen','len')">Лен</div>
+</div>
+<div class="field-error" id="err-mat-vechen">Моля, изберете материал</div>
+<!-- Velur card: just color swatch -->
+<div class="material-card" id="mat-card-vechen-velur">
+<div class="material-card-body">
+<img alt="Цветова палитра велур" class="swatch-strip" src="assets/colors-velur.jpg"/>
+<div class="color-input-row">
+<input class="color-num-field" id="color-vechen" max="13" min="1" placeholder="№" type="number"/>
+<div class="color-hint">Изберете номер на цвят от палитрата (1–13)</div>
+</div>
+<div class="field-error" id="err-color-vechen">Моля, въведете номер на цвят (1–13)</div>
+</div>
+</div>
+<!-- Linen card: linen info image, no color choice -->
+<div class="material-card" id="mat-card-vechen-len" style="border:1.5px solid #d0c8bc;border-radius:16px;overflow:hidden;margin-top:14px">
+<img alt="Лен" src="assets/material-len-vechen.jpg" style="width:100%;display:block;object-fit:cover;max-height:300px"/>
+<div style="padding:14px 18px 16px">
+<p style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:#3a2e28;margin-bottom:6px;line-height:1.5">Предлага се само в натурален цвят, като на снимката.</p>
+<p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;color:#4a3e32;margin-bottom:12px;line-height:1.6">Използваме само натурален 100% неизбелен лен.</p>
+<p style="font-size:11.5px;color:#9a8e82;font-weight:300;line-height:1.6;font-family:'Jost',sans-serif">Поради липсата на химична обработка е възможно да присъстват малки несъвършенства.</p>
+</div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Вид на картичката</div>
+<div class="radio-pills">
+<div class="radio-pill" data-group="vechen-type" data-val="пожелание" onclick="selectPill(this,'vechen-type')">Пожелание</div>
+<div class="radio-pill" data-group="vechen-type" data-val="покана" onclick="selectPill(this,'vechen-type')">Покана</div>
+<div class="radio-pill" data-group="vechen-type" data-val="пожелание+плик" onclick="selectPill(this,'vechen-type')">Пожелание + Плик</div>
+<div class="radio-pill" data-group="vechen-type" data-val="пожелание+снимка" onclick="selectPill(this,'vechen-type')">Пожелание + Снимка</div>
+</div>
+<div class="field-error" id="err-cardtype-vechen">Моля, изберете вид на картичката преди да продължите</div>
+</div>
+<div class="custom-block" id="photo-vechen" style="display:none">
+<div class="custom-block-title">Качете снимка</div>
+<div class="upload-area" id="up-area-vechen"><input accept="image/*" onchange="handleUpload(this,'vechen')" type="file"/>
+<span class="upload-icon">🖼️</span>
+<div class="upload-text">Кликнете тук или плъзнете снимката<br/><strong>JPG, PNG – до 50MB</strong></div>
+</div>
+<div class="upload-preview" id="prev-vechen"></div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Текст за картичката</div>
+<textarea class="input-field" id="text-vechen" placeholder="Напишете пожеланието или текста, който искате да присъства..."></textarea>
+<div class="field-error" id="err-text-vechen">Моля, напишете текст за картичката</div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Гравиране на корицата</div>
+<div class="radio-pills">
+<div class="toggle-pill" id="eng-vechen-yes" onclick="toggleEngrave('vechen',true)">Да, искам гравиране</div>
+<div class="toggle-pill" id="eng-vechen-no" onclick="toggleEngrave('vechen',false)">Без гравиране</div>
+</div>
+<div class="engrave-wrap" id="eng-field-vechen">
+<label class="label-text" style="margin-top:12px">Изберете текст за гравиране</label>
+<select class="input-field" id="eng-text-vechen" onchange="updateTotal()">
+<option value="">— Изберете —</option>
+<option value="Честито завършване" data-price="6.99">Честито завършване (+€6.99)</option>
+<option value="Честита сватба" data-price="6.99">Честита сватба (+€6.99)</option>
+<option value="Честито кръщение" data-price="6.99">Честито кръщение (+€6.99)</option>
+<option value="Честито" data-price="4.00">Честито (+€4.00)</option>
+<option value="Честит Рожден Ден" data-price="8.99">Честит Рожден Ден (+€8.99)</option>
+<option value="Честит Имен Ден" data-price="8.99">Честит Имен Ден (+€8.99)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div id="custom-nasledstvo" style="display:none">
+<div class="custom-block">
+<div class="custom-block-title">Изберете материал</div>
+<div class="radio-pills" style="margin-bottom:14px">
+<div class="radio-pill" id="mat-nasledstvo-velur" onclick="selectMaterial('nasledstvo','velur')">Велур</div>
+<div class="radio-pill" id="mat-nasledstvo-len" onclick="selectMaterial('nasledstvo','len')">Лен</div>
+</div>
+<div class="field-error" id="err-mat-nasledstvo">Моля, изберете материал</div>
+<!-- Velur card: just color swatch -->
+<div class="material-card" id="mat-card-nasledstvo-velur">
+<div class="material-card-body">
+<img alt="Цветова палитра велур" class="swatch-strip" src="assets/colors-velur.jpg"/>
+<div class="color-input-row">
+<input class="color-num-field" id="color-nasledstvo" max="13" min="1" placeholder="№" type="number"/>
+<div class="color-hint">Изберете номер на цвят от палитрата (1–13)</div>
+</div>
+<div class="field-error" id="err-color-nasledstvo">Моля, въведете номер на цвят (1–13)</div>
+</div>
+</div>
+<!-- Linen card: linen info image, no color choice -->
+<div class="material-card" id="mat-card-nasledstvo-len" style="border:1.5px solid #d0c8bc;border-radius:16px;overflow:hidden;margin-top:14px">
+<img alt="Лен" src="assets/material-len-vechen.jpg" style="width:100%;display:block;object-fit:cover;max-height:300px"/>
+<div style="padding:14px 18px 16px">
+<p style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:#3a2e28;margin-bottom:6px;line-height:1.5">Предлага се само в натурален цвят, като на снимката.</p>
+<p style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;color:#4a3e32;margin-bottom:12px;line-height:1.6">Използваме само натурален 100% неизбелен лен.</p>
+<p style="font-size:11.5px;color:#9a8e82;font-weight:300;line-height:1.6;font-family:'Jost',sans-serif">Поради липсата на химична обработка е възможно да присъстват малки несъвършенства.</p>
+</div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Вид на картичката</div>
+<div class="radio-pills">
+<div class="radio-pill" data-group="nasledstvo-type" data-val="пожелание" onclick="selectPill(this,'nasledstvo-type')">Пожелание</div>
+<div class="radio-pill" data-group="nasledstvo-type" data-val="покана" onclick="selectPill(this,'nasledstvo-type')">Покана</div>
+<div class="radio-pill" data-group="nasledstvo-type" data-val="пожелание+плик" onclick="selectPill(this,'nasledstvo-type')">Пожелание + Плик</div>
+<div class="radio-pill" data-group="nasledstvo-type" data-val="пожелание+снимка" onclick="selectPill(this,'nasledstvo-type')">Пожелание + Снимка</div>
+</div>
+<div class="field-error" id="err-cardtype-nasledstvo">Моля, изберете вид на картичката преди да продължите</div>
+</div>
+<div class="custom-block" id="photo-nasledstvo" style="display:none">
+<div class="custom-block-title">Качете снимка</div>
+<div class="upload-area" id="up-area-nasledstvo"><input accept="image/*" onchange="handleUpload(this,'nasledstvo')" type="file"/>
+<span class="upload-icon">🖼️</span>
+<div class="upload-text">Кликнете тук или плъзнете снимката<br/><strong>JPG, PNG – до 50MB</strong></div>
+</div>
+<div class="upload-preview" id="prev-nasledstvo"></div>
+</div>
+<div class="custom-block">
+<div class="custom-block-title">Текст за картичката</div>
+<textarea class="input-field" id="text-nasledstvo" placeholder="Напишете пожеланието или текста, който искате да присъства..."></textarea>
+<div class="field-error" id="err-text-nasledstvo">Моля, напишете текст за картичката</div>
+</div>
+</div>
+</div></div> <div id="eec-section" style="margin-top:28px;border:1.5px solid var(--go);border-radius:16px;padding:24px 22px;background:linear-gradient(135deg,#fdf8ee,#faf4e4);">
+<div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:var(--dk);margin-bottom:16px;line-height:1.6">Станете част от преференциалните ни клиенти с Edelweiss Exclusive, получете 10% отстъпка на следващата си поръчка и получавайте ежемесечни промоционални оферти изготвени специално за Вас срещу еднократен абонамент от 4.99€.</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;">
+<div class="toggle-pill" id="eec-yes" onclick="selectEEC('yes')">✦ Искам отстъпки.</div>
+<div class="toggle-pill" id="eec-no" onclick="selectEEC('no')">Не искам отстъпки.</div>
+</div>
+<div class="error-msg" id="err-eec" style="margin-top:10px">Моля, изберете една от двете опции преди да продължите</div>
+</div>
+<div class="btn-row"><button class="btn-back" onclick="goToStep(2)">← Назад</button><button class="btn-next" onclick="goToStep(4)">Продължи →</button></div>
+</div></div>
+<div class="step-panel" id="step-4"><div class="panel-inner">
+<div class="panel-title">Дата и дигитален преглед</div>
+<div class="panel-subtitle">Кога Ви е нужна картичката и на кой имейл да изпратим дигиталния вариант</div>
+<div class="field-group">
+<label class="label-text">Дата, за която Ви е нужна картичката</label>
+<input class="input-field" id="needed-date" oninput="onDateChange()" type="date"/>
+<div class="date-notice" id="date-notice"></div>
+<div class="premium-date-box" id="prem-date-box">
+<div class="premium-date-title">⚡ Експресна изработка</div>
+<div class="premium-date-text">Избраната дата е само <span id="days-left"></span> ден/а напред. Можем да го направим с приоритет срещу <strong id="express-price-text"></strong>.</div>
+<div>
+<span class="prem-pill" id="prem-yes" onclick="selectPremDate(true)">Да, избирам Експресна (<span id="express-price-btn"></span>)</span>
+<span class="prem-pill" id="prem-no" onclick="selectPremDate(false)">Не, ще изчакам 3+ дни</span>
+</div>
+</div>
+</div>
+<div class="field-group">
+<label class="label-text">Имейл за дигитален преглед</label>
+<input class="input-field" id="email" placeholder="вашият@имейл.com" type="email"/>
+<div class="hint-text" style="margin-top:8px">✦ Ще изпратим дигиталният вариант за Вашето одобрение преди финалната изработка</div>
+</div>
+<div class="error-msg" id="err-4"></div>
+<div class="btn-row"><button class="btn-back" onclick="goToStep(3)">← Назад</button><button class="btn-next" onclick="goToStep(5)">Продължи →</button></div>
+</div></div>
+<div class="step-panel" id="step-5"><div class="panel-inner">
+<div class="panel-title">Доставка</div>
+<div class="panel-subtitle">Изберете куриер и начин на получаване</div>
+<div class="field-group">
+<label class="label-text">Куриер</label>
+<div class="courier-grid">
+<div class="courier-btn" onclick="selectCourier(this,'Еконт')"><span class="courier-icon">📦</span><div class="courier-name">Еконт</div></div>
+<div class="courier-btn" onclick="selectCourier(this,'Спиди')"><span class="courier-icon">🚀</span><div class="courier-name">Спиди</div></div>
+</div>
+<div class="field-error" id="err-courier">Моля, изберете куриер</div>
+</div>
+<div class="field-group" id="delivery-type-wrap" style="display:none">
+<label class="label-text">Начин на получаване</label>
+<div class="delivery-type-pills">
+<div class="del-pill" id="del-home" onclick="selectDeliveryType('home')"><span class="del-pill-icon">🏠</span><div class="del-pill-label">До адрес</div><div class="del-pill-sub">Доставка до врата</div></div>
+<div class="del-pill" id="del-office" onclick="selectDeliveryType('office')"><span class="del-pill-icon">🏢</span><div class="del-pill-label" id="del-office-label">До офис</div><div class="del-pill-sub" id="del-office-sub">Вземи от офис на куриера</div></div>
+</div>
+<div class="field-error" id="err-deltype">Моля, изберете начин на получаване</div>
+</div>
+<div class="field-group"><label class="label-text">Три имена на получателя</label><input class="input-field" id="rec-name" oninput="validateName()" placeholder="Иван Иванов Иванов" type="text"/><div class="field-error" id="err-name">Моля, въведете пълно име (поне две думи)</div></div>
+<div class="field-group"><label class="label-text">Телефон за контакт</label><input class="input-field" id="rec-phone" oninput="validatePhone()" placeholder="+359 88 888 8888" type="tel"/><div class="field-error" id="err-phone">Моля, въведете валиден телефонен номер</div></div>
+<div class="field-group" id="home-addr-wrap" style="display:none">
+<label class="label-text">Адрес за доставка</label>
+<input class="input-field" id="rec-address" oninput="validateAddress()" placeholder="Град, квартал, улица/блок..." type="text"/>
+<div class="hint-text" style="margin-top:6px">Моля, включете: <strong>град</strong>, <strong>квартал</strong> и <strong>улица / блок</strong></div>
+<div class="field-error" id="err-address">Адресът трябва да съдържа град, квартал и улица/блок</div>
+</div>
+<div class="field-group" id="office-addr-wrap" style="display:none">
+<label class="label-text" id="office-label">Търсете офис</label>
+<div class="office-search-wrap">
+<input autocomplete="off" class="input-field" id="office-search" oninput="searchOffice()" placeholder="Въведете град, квартал или адрес..." type="text"/>
+<div class="office-results" id="office-results"></div>
+</div>
+<div class="field-error" id="err-office">Моля, изберете офис от падащото меню — не е достатъчно само да напишете града</div>
+<div id="selected-office-display" style="font-size:12px;color:var(--gd);margin-top:8px;font-weight:500"></div>
+</div>
+<div style="margin-top:22px;margin-bottom:6px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);font-weight:600;">Обобщение</div>
+<div class="summary-box" id="order-summary"></div>
+<div class="error-msg" id="err-5">Моля, коригирайте отбелязаните полета преди да продължите</div>
+<div class="btn-row"><button class="btn-back" onclick="goToStep(4)">← Назад</button><button class="btn-next" onclick="trySubmit()">Изпратете поръчката ✦</button></div>
+</div></div>
+<div class="step-panel" id="step-6"><div class="panel-inner">
+<div class="success-panel">
+<span class="success-icon">🌷</span>
+<div class="success-title">Благодарим Ви, че ни направихте<br/>част от Вашия празник!</div>
+<div class="success-divider"></div>
+<div class="success-text">Дигиталният вариант на картичката ще получите на посочения имейл за Вашето одобрение преди финалната изработка.</div>
+<div id="eec-confirmation" style="display:none;margin-top:28px;padding:32px 28px;border:none;border-radius:20px;background:linear-gradient(135deg,#fdf8ee,#f5edd8);text-align:center;box-shadow:0 4px 32px rgba(180,150,80,0.18),0 1.5px 0 #d4b86a,inset 0 0 0 1.5px rgba(212,184,106,0.45);">
+<div style="position:relative;display:inline-block;margin:0 auto 22px;">
+  <div style="width:160px;height:160px;border-radius:50%;overflow:hidden;border:3px solid #d4b86a;box-shadow:0 0 0 6px rgba(212,184,106,0.18),0 0 0 9px rgba(212,184,106,0.08),0 6px 24px rgba(120,90,30,0.18);margin:0 auto;background:#fff;">
+    <img alt="Edelweiss Exclusive Club" src="assets/edelweiss-exclusive-club-confirmation.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+  </div>
+  <div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed rgba(212,184,106,0.55);pointer-events:none;"></div>
+</div>
+<div style="font-family:'Cormorant Garamond',serif;font-size:15.5px;color:var(--go);font-weight:500;line-height:1.9;max-width:420px;margin:0 auto;">
+  С Вашето членство започва едно по-специално преживяване — с изящество, внимание и красиви жестове, създадени специално за Вас.<br/><br/>
+  Очаквайте нашите промоционални оферти на посочения от Вас имейл и/или телефон.
+</div>
+</div>
+<div class="success-brand">Edelweiss Studio</div>
+</div>
+</div></div>
+<!-- /card -->
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+<div class="modal-box">
+<span class="modal-flower">🌸</span>
+<div class="modal-title">Потвърждение на поръчката</div>
+<div class="modal-text">
+      Преди да финализираме поръчката Ви, бихме искали да се уверим, че всяка избрана от Вас опция отразява именно Вашето желание.<br/><br/>
+      Точното потвърждение ще ни позволи да изготвим дигиталния вариант на картичката с максимална прецизност — бързо, грижливо и в хармония с Вашата визия.<br/><br/>
+<em>Сигурни ли сте, че всички избрани опции са верни?</em>
+</div>
+<div class="modal-btns">
+<button class="modal-btn-back" onclick="closeModal()">← Редактирай</button>
+<button class="modal-btn-confirm" onclick="confirmOrder()">Да, потвърждавам ✦</button>
+</div>
+</div>
+</div>
+<script>
+const SUPABASE_URL = 'https://rjjfqvvrbeetsrnvevyp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_n2SN9wIuCxbI1vCPjxdJkw_Fp8qvUNe';
+window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+var OFFICES = {"Еконт": [{"city": "София", "quarter": "Център", "addr": "ул. Граф Игнатиев 4"}, {"city": "София", "quarter": "Център", "addr": "бул. Витоша 146"}, {"city": "София", "quarter": "Център", "addr": "бул. Патриарх Евтимий 82"}, {"city": "София", "quarter": "Център", "addr": "ул. Гурко 14"}, {"city": "София", "quarter": "Лозенец", "addr": "ул. Свети Наум 26"}, {"city": "София", "quarter": "Лозенец", "addr": "бул. Черни връх 43"}, {"city": "София", "quarter": "Лозенец", "addr": "бул. Арсеналски 2"}, {"city": "София", "quarter": "Борово", "addr": "бул. Тодор Каблешков 71"}, {"city": "София", "quarter": "Борово", "addr": "ул. Хайдушко изворче 8"}, {"city": "София", "quarter": "Стрелбище", "addr": "ул. Зайчар 84"}, {"city": "София", "quarter": "Младост 1", "addr": "бул. Цариградско шосе 80"}, {"city": "София", "quarter": "Младост 1", "addr": "жк Младост 1, бл. 51"}, {"city": "София", "quarter": "Младост 2", "addr": "жк Младост 2, бл. 201"}, {"city": "София", "quarter": "Младост 3", "addr": "жк Младост 3, бл. 375"}, {"city": "София", "quarter": "Младост 4", "addr": "бул. Александър Малинов 91"}, {"city": "София", "quarter": "Люлин 1", "addr": "жк Люлин 1, бл. 101"}, {"city": "София", "quarter": "Люлин 2", "addr": "жк Люлин 2, бл. 226"}, {"city": "София", "quarter": "Люлин 6", "addr": "жк Люлин 6, бл. 607"}, {"city": "София", "quarter": "Люлин 7", "addr": "жк Люлин 7, бл. 714"}, {"city": "София", "quarter": "Люлин 8", "addr": "жк Люлин 8, бл. 821"}, {"city": "София", "quarter": "Дружба 1", "addr": "жк Дружба 1, бл. 25"}, {"city": "София", "quarter": "Дружба 2", "addr": "жк Дружба 2, бл. 211"}, {"city": "София", "quarter": "Надежда 1", "addr": "ул. Добротич 3"}, {"city": "София", "quarter": "Надежда 3", "addr": "жк Надежда 3, бл. 303"}, {"city": "София", "quarter": "Надежда 4", "addr": "бул. Рожен 50"}, {"city": "София", "quarter": "Обеля", "addr": "жк Обеля 2, бл. 225"}, {"city": "София", "quarter": "Банишора", "addr": "ул. Средна гора 2"}, {"city": "София", "quarter": "Триадица", "addr": "ул. Позитано 2"}, {"city": "София", "quarter": "Красна поляна", "addr": "жк Красна поляна 1, бл. 26"}, {"city": "София", "quarter": "Красно село", "addr": "ул. Хубча 14"}, {"city": "София", "quarter": "Сердика", "addr": "бул. Сливница 2"}, {"city": "София", "quarter": "Илинден", "addr": "ул. Пиротска 2"}, {"city": "София", "quarter": "Захарна фабрика", "addr": "жк Захарна фабрика, бл. 51В"}, {"city": "София", "quarter": "Гео Милев", "addr": "ул. Свети Георги Победоносец 9"}, {"city": "София", "quarter": "Слатина", "addr": "бул. Шипченски проход 44"}, {"city": "София", "quarter": "Студентски град", "addr": "жк Студентски град, бл. 5"}, {"city": "София", "quarter": "Симеоново", "addr": "ул. Самоковско шосе 2Г"}, {"city": "София", "quarter": "Горна баня", "addr": "ул. Суходолска 3"}, {"city": "София", "quarter": "Овча купел", "addr": "жк Овча купел 1, бл. 16"}, {"city": "София", "quarter": "Западен парк", "addr": "ул. Методий Кусев 3"}, {"city": "Пловдив", "quarter": "Център", "addr": "бул. Марица 73"}, {"city": "Пловдив", "quarter": "Център", "addr": "ул. Богомил 12"}, {"city": "Пловдив", "quarter": "Каршияка", "addr": "бул. Руски 51"}, {"city": "Пловдив", "quarter": "Тракия", "addr": "жк Тракия, бл. 96"}, {"city": "Пловдив", "quarter": "Тракия", "addr": "бул. Освобождение 212"}, {"city": "Пловдив", "quarter": "Кършияка", "addr": "бул. Пещерско шосе 56"}, {"city": "Пловдив", "quarter": "Прослав", "addr": "ул. Прослав 41"}, {"city": "Пловдив", "quarter": "Столипиново", "addr": "ул. Димо Хаджидимов 3"}, {"city": "Пловдив", "quarter": "Кючук Париж", "addr": "ул. Брезовска 186"}, {"city": "Пловдив", "quarter": "Западен", "addr": "бул. Дунав 15"}, {"city": "Пловдив", "quarter": "Север", "addr": "бул. Съединение 122"}, {"city": "Пловдив", "quarter": "Беломорски", "addr": "ул. Беломорска 5"}, {"city": "Варна", "quarter": "Център", "addr": "ул. Прилеп 6"}, {"city": "Варна", "quarter": "Широк център", "addr": "бул. Сливница 186"}, {"city": "Варна", "quarter": "Чайка", "addr": "жк Чайка, бл. 64"}, {"city": "Варна", "quarter": "Владислав Варненчик", "addr": "бул. Владислав Варненчик 92"}, {"city": "Варна", "quarter": "Владислав Варненчик 2", "addr": "жк Владислав Варненчик 2, бл. 2003"}, {"city": "Варна", "quarter": "Младост", "addr": "жк Младост, бл. 105"}, {"city": "Варна", "quarter": "Трошево", "addr": "жк Трошево, бл. 34"}, {"city": "Варна", "quarter": "Аспарухово", "addr": "жк Аспарухово, ул. Атанас Жечев 32"}, {"city": "Варна", "quarter": "Победа", "addr": "жк Победа, бл. 16"}, {"city": "Варна", "quarter": "Левски", "addr": "жк Левски, бл. 201"}, {"city": "Бургас", "quarter": "Център", "addr": "ул. Александровска 67"}, {"city": "Бургас", "quarter": "Център", "addr": "ул. Хан Крум 14"}, {"city": "Бургас", "quarter": "Лазур", "addr": "жк Лазур, бл. 27"}, {"city": "Бургас", "quarter": "Меден рудник", "addr": "жк Меден рудник, бл. 44"}, {"city": "Бургас", "quarter": "Зорница", "addr": "жк Зорница, бл. 4"}, {"city": "Бургас", "quarter": "Славейков", "addr": "жк Славейков, бл. 26"}, {"city": "Бургас", "quarter": "Победа", "addr": "жк Победа, бл. 3"}, {"city": "Стара Загора", "quarter": "Център", "addr": "бул. Цар Симеон Велики 72"}, {"city": "Стара Загора", "quarter": "Три чучура", "addr": "жк Три чучура, бл. 44"}, {"city": "Стара Загора", "quarter": "Казански", "addr": "жк Казански, бл. 2"}, {"city": "Стара Загора", "quarter": "Железник", "addr": "жк Железник, бл. 86"}, {"city": "Стара Загора", "quarter": "Аязмото", "addr": "ул. Генерал Столетов 117"}, {"city": "Русе", "quarter": "Център", "addr": "ул. Александровска 128"}, {"city": "Русе", "quarter": "Чародейка", "addr": "жк Чародейка Север, бл. 43"}, {"city": "Русе", "quarter": "Дружба", "addr": "жк Дружба 3, бл. 61"}, {"city": "Русе", "quarter": "Здравец", "addr": "жк Здравец Изток, бл. 113"}, {"city": "Русе", "quarter": "Средец", "addr": "жк Средец, бл. 13"}, {"city": "Плевен", "quarter": "Център", "addr": "ул. Васил Левски 176"}, {"city": "Плевен", "quarter": "Сторгозия", "addr": "жк Сторгозия, бл. 4"}, {"city": "Плевен", "quarter": "Дружба", "addr": "жк Дружба, бл. 10"}, {"city": "Плевен", "quarter": "Кайлъка", "addr": "ул. Данаил Попов 2"}, {"city": "Велико Търново", "quarter": "Център", "addr": "ул. Васил Левски 48"}, {"city": "Велико Търново", "quarter": "Колю Фичето", "addr": "жк Колю Фичето, бл. 14"}, {"city": "Велико Търново", "quarter": "Картала", "addr": "жк Картала, бл. 18"}, {"city": "Благоевград", "quarter": "Център", "addr": "ул. Тодор Александров 17"}, {"city": "Благоевград", "quarter": "Струмско", "addr": "жк Струмско, бл. 30"}, {"city": "Благоевград", "quarter": "Еленово", "addr": "ул. Иван Михайлов 72"}, {"city": "Враца", "quarter": "Център", "addr": "ул. Христо Ботев 43"}, {"city": "Хасково", "quarter": "Център", "addr": "бул. България 140"}, {"city": "Хасково", "quarter": "Орфей", "addr": "жк Орфей, бл. 8"}, {"city": "Перник", "quarter": "Център", "addr": "бул. Св. Св. Кирил и Методий 44"}, {"city": "Перник", "quarter": "Мошино", "addr": "жк Мошино, бл. 17"}, {"city": "Шумен", "quarter": "Център", "addr": "бул. Симеон Велики 31"}, {"city": "Шумен", "quarter": "Тракия", "addr": "жк Тракия, бл. 52"}, {"city": "Ямбол", "quarter": "Център", "addr": "ул. Търговска 77"}, {"city": "Ямбол", "quarter": "Граф Игнатиево", "addr": "жк Граф Игнатиево, бл. 14"}, {"city": "Сливен", "quarter": "Център", "addr": "бул. Цар Освободител 26"}, {"city": "Сливен", "quarter": "Дружба", "addr": "жк Дружба, бл. 8"}, {"city": "Добрич", "quarter": "Център", "addr": "ул. Независимост 12"}, {"city": "Добрич", "quarter": "Русия", "addr": "жк Русия 2, бл. 28"}, {"city": "Монтана", "quarter": "Център", "addr": "ул. Извора 1"}, {"city": "Кюстендил", "quarter": "Център", "addr": "пл. Велбъжд 1"}, {"city": "Видин", "quarter": "Център", "addr": "ул. Цар Симеон Велики 5"}, {"city": "Разград", "quarter": "Център", "addr": "бул. България 28"}, {"city": "Силистра", "quarter": "Център", "addr": "бул. Македония 50"}, {"city": "Търговище", "quarter": "Център", "addr": "ул. Васил Левски 13"}, {"city": "Габрово", "quarter": "Център", "addr": "ул. Априлово 1"}, {"city": "Ловеч", "quarter": "Център", "addr": "ул. Търговска 32"}, {"city": "Пазарджик", "quarter": "Център", "addr": "бул. България 2"}, {"city": "Смолян", "quarter": "Център", "addr": "бул. България 13"}, {"city": "Кърджали", "quarter": "Център", "addr": "бул. Беломорски 60"}, {"city": "Казанлък", "quarter": "Център", "addr": "бул. Розова Долина 4"}, {"city": "Димитровград", "quarter": "Център", "addr": "бул. Г. Димитров 1"}, {"city": "Свиленград", "quarter": "Център", "addr": "ул. Септемврийци 8"}, {"city": "Асеновград", "quarter": "Център", "addr": "пл. Академик Николай Хайтов 1"}, {"city": "Карлово", "quarter": "Център", "addr": "бул. Освобождение 2"}, {"city": "Самоков", "quarter": "Център", "addr": "ул. Македония 34"}, {"city": "Ботевград", "quarter": "Център", "addr": "пл. Освобождение 3"}, {"city": "Дупница", "quarter": "Център", "addr": "ул. Свобода 4"}, {"city": "Петрич", "quarter": "Център", "addr": "бул. Стефан Стамболов 2"}, {"city": "Сандански", "quarter": "Център", "addr": "пл. България 1"}, {"city": "Горна Оряховица", "quarter": "Център", "addr": "бул. Независимост 3"}, {"city": "Лом", "quarter": "Център", "addr": "ул. Дунавска 12"}, {"city": "Троян", "quarter": "Център", "addr": "пл. Възраждане 1"}, {"city": "Тетевен", "quarter": "Център", "addr": "ул. Иван Вазов 2"}, {"city": "Червен бряг", "quarter": "Център", "addr": "ул. Освобождение 6"}], "Спиди": [{"city": "София", "quarter": "Център", "addr": "ул. Дамян Груев 6", "type": "офис"}, {"city": "София", "quarter": "Лозенец", "addr": "бул. Черни връх 51Б", "type": "офис"}, {"city": "София", "quarter": "Банишора", "addr": "ул. Средна гора 2", "type": "офис"}, {"city": "София", "quarter": "Симеоново", "addr": "бул. Симеоновско шосе 22", "type": "офис"}, {"city": "София", "quarter": "Дружба 2", "addr": "жк Дружба 2, бл. 211", "type": "офис"}, {"city": "София", "quarter": "Левски В", "addr": "жк Левски В, бл. 6", "type": "офис"}, {"city": "София", "quarter": "Младост 4", "addr": "бул. Александър Малинов 48", "type": "офис"}, {"city": "София", "quarter": "Люлин 6", "addr": "жк Люлин 6, бл. 637", "type": "офис"}, {"city": "София", "quarter": "Надежда", "addr": "жк Надежда 1, бл. 101", "type": "офис"}, {"city": "София", "quarter": "Красна поляна", "addr": "жк Красна поляна 3, бл. 333", "type": "офис"}, {"city": "София", "quarter": "Бояна", "addr": "ул. Боян Магесника 12", "type": "офис"}, {"city": "София", "quarter": "Витоша", "addr": "ул. Магнаурска школа 6", "type": "офис"}, {"city": "София", "quarter": "Овча купел", "addr": "бул. Цар Борис III 168", "type": "офис"}, {"city": "София", "quarter": "Дружба 1", "addr": "бул. Кръстю Пастухов 40 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Младост 1", "addr": "бул. Цариградско шосе 20 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Гео Милев", "addr": "ул. Бигла 2 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Слатина", "addr": "бул. Шипченски проход 63 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Люлин 7", "addr": "жк Люлин 7, бл. 712 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Стрелбище", "addr": "ул. Зайчар 32 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Борово", "addr": "ул. Пчела 12 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Красно село", "addr": "жк Красно село, бл. 234 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Триадица", "addr": "ул. Пиротска 64 (автомат)", "type": "кутия"}, {"city": "София", "quarter": "Студентски град", "addr": "жк Студентски град, бл. 3 (автомат)", "type": "кутия"}, {"city": "Пловдив", "quarter": "Център", "addr": "ул. Брезовска 186", "type": "офис"}, {"city": "Пловдив", "quarter": "Каршияка", "addr": "ул. Димитър Талев 2", "type": "офис"}, {"city": "Пловдив", "quarter": "Тракия", "addr": "жк Тракия, бл. 97А", "type": "офис"}, {"city": "Пловдив", "quarter": "Кючук Париж", "addr": "бул. Дунав 15", "type": "офис"}, {"city": "Пловдив", "quarter": "Тракия", "addr": "жк Тракия, бл. 51 (автомат)", "type": "кутия"}, {"city": "Пловдив", "quarter": "Прослав", "addr": "ул. Прослав 20 (автомат)", "type": "кутия"}, {"city": "Варна", "quarter": "Широк център", "addr": "ул. Осми Приморски полк 135", "type": "офис"}, {"city": "Варна", "quarter": "Колхозен пазар", "addr": "бул. Христо Смирненски 2А", "type": "офис"}, {"city": "Варна", "quarter": "Чайка", "addr": "жк Чайка, бл. 64 (автомат)", "type": "кутия"}, {"city": "Варна", "quarter": "Владислав Варненчик", "addr": "бул. Владислав Варненчик 122 (автомат)", "type": "кутия"}, {"city": "Варна", "quarter": "Трошево", "addr": "жк Трошево, бл. 30 (автомат)", "type": "кутия"}, {"city": "Варна", "quarter": "Аспарухово", "addr": "жк Аспарухово, бл. 25 (автомат)", "type": "кутия"}, {"city": "Бургас", "quarter": "Център", "addr": "ул. Богориди 58", "type": "офис"}, {"city": "Бургас", "quarter": "Зорница", "addr": "жк Зорница, бл. 12 (автомат)", "type": "кутия"}, {"city": "Бургас", "quarter": "Лазур", "addr": "жк Лазур, бл. 14 (автомат)", "type": "кутия"}, {"city": "Бургас", "quarter": "Меден рудник", "addr": "жк Меден рудник, зона Г, бл. 44 (автомат)", "type": "кутия"}, {"city": "Стара Загора", "quarter": "Център", "addr": "ул. Кирил и Методий 63", "type": "офис"}, {"city": "Стара Загора", "quarter": "Три чучура", "addr": "жк Три чучура, бл. 21 (автомат)", "type": "кутия"}, {"city": "Русе", "quarter": "Център", "addr": "ул. Тулча 10", "type": "офис"}, {"city": "Русе", "quarter": "Здравец", "addr": "жк Здравец Изток, бл. 27 (автомат)", "type": "кутия"}, {"city": "Плевен", "quarter": "Център", "addr": "ул. Сан Стефано 87", "type": "офис"}, {"city": "Велико Търново", "quarter": "Център", "addr": "ул. Никола Габровски 38", "type": "офис"}, {"city": "Благоевград", "quarter": "Център", "addr": "бул. Свобода 2", "type": "офис"}, {"city": "Враца", "quarter": "Център", "addr": "бул. Демокрация 10", "type": "офис"}, {"city": "Хасково", "quarter": "Център", "addr": "пл. Свобода 3", "type": "офис"}, {"city": "Шумен", "quarter": "Център", "addr": "бул. Мадара 4", "type": "офис"}, {"city": "Ямбол", "quarter": "Център", "addr": "ул. Граф Игнатиев 21", "type": "офис"}, {"city": "Монтана", "quarter": "Център", "addr": "ул. Извора 1", "type": "офис"}, {"city": "Кюстендил", "quarter": "Център", "addr": "пл. Велбъжд 1", "type": "офис"}, {"city": "Добрич", "quarter": "Център", "addr": "бул. Добруджа 4", "type": "офис"}, {"city": "Сливен", "quarter": "Център", "addr": "бул. Цар Освободител 18", "type": "офис"}, {"city": "Пазарджик", "quarter": "Център", "addr": "бул. Стефан Стамболов 2", "type": "офис"}, {"city": "Казанлък", "quarter": "Център", "addr": "бул. Розова Долина 8", "type": "офис"}, {"city": "Перник", "quarter": "Център", "addr": "бул. Св. Св. Кирил и Методий 61", "type": "офис"}, {"city": "Габрово", "quarter": "Център", "addr": "ул. Тодор Кабаиванов 2", "type": "офис"}, {"city": "Видин", "quarter": "Център", "addr": "бул. Панония 1", "type": "офис"}, {"city": "Ловеч", "quarter": "Център", "addr": "ул. Ловчанска 1", "type": "офис"}, {"city": "Смолян", "quarter": "Смолян", "addr": "бул. България 20", "type": "офис"}, {"city": "Кърджали", "quarter": "Център", "addr": "бул. България 88", "type": "офис"}, {"city": "Разград", "quarter": "Център", "addr": "бул. Априлско въстание 30", "type": "офис"}, {"city": "Силистра", "quarter": "Център", "addr": "ул. Дунав 2", "type": "офис"}, {"city": "Асеновград", "quarter": "Център", "addr": "ул. Цар Иван Асен II 22", "type": "офис"}, {"city": "Дупница", "quarter": "Център", "addr": "ул. Свобода 12", "type": "офис"}, {"city": "Самоков", "quarter": "Център", "addr": "ул. Македония 28", "type": "офис"}, {"city": "Горна Оряховица", "quarter": "Център", "addr": "бул. Цар Освободител 8", "type": "офис"}]};
+var EXPRESS_PRICE = {neshen:5, vechen:15, nasledstvo:19.99};
+var S = {
+  occasion:'', product:'', courier:'', deliveryType:'',
+  selectedOffice:null, premDate:null, step:1,
+  engrave_n:false, engrave_v:false, engrave_nas:false,
+  material_vechen:'', material_nasledstvo:'',
+  eec: null
+};
+
+// ── PRICE ──
+function calcTotal() {
+  var base = {neshen:17.5, vechen:39.5, nasledstvo:48.5};
+  var t = base[S.product] || 0;
+  function engPrice(id){var s=document.getElementById(id);if(!s||!s.value)return 0;var o=s.options[s.selectedIndex];return parseFloat(o.getAttribute('data-price'))||0;}
+  if (S.product==='neshen' && S.engrave_n) t += engPrice('eng-text-n');
+  if (S.product==='vechen' && S.engrave_v) t += engPrice('eng-text-vechen');
+  if (S.product==='nasledstvo' && S.engrave_nas) t += engPrice('eng-text-nasledstvo');
+  if (S.premDate===true) t += EXPRESS_PRICE[S.product] || 0;
+  if (S.eec === 'yes') t += 4.99;
+  return t.toFixed(2);
+}
+function fmtPrice(p) { return isNaN(p)?'&#8364;'+p:(Number.isInteger(p)?'&#8364;'+p+'.00':'&#8364;'+p.toFixed(2)); }
+function getExpressPrice() { return EXPRESS_PRICE[S.product]||15; }
+
+// ── STEP 1 ──
+function selectOccasion(el) {
+  document.querySelectorAll('.occasion-btn').forEach(function(b){b.classList.remove('selected');});
+  el.classList.add('selected'); S.occasion=el.dataset.val;
+  document.getElementById('custom-occasion').value=''; hide('err-1');
+}
+function onCustomOccasion() {
+  var v=document.getElementById('custom-occasion').value.trim();
+  document.querySelectorAll('.occasion-btn').forEach(function(b){b.classList.remove('selected');});
+  S.occasion=v; hide('err-1');
+}
+
+// ── STEP 2 ──
+function selectProduct(el, type) {
+  document.querySelectorAll('.product-card').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected'); S.product=type; hide('err-2');
+}
+
+// ── STEP 3 ──
+function selectMaterial(prod, mat) {
+  ['velur','len'].forEach(function(m){
+    var pill = document.getElementById('mat-'+prod+'-'+m);
+    var card = document.getElementById('mat-card-'+prod+'-'+m);
+    if (pill) pill.classList.toggle('selected', m===mat);
+    if (card) card.classList.toggle('show', m===mat);
+  });
+  if (prod==='vechen') S.material_vechen=mat;
+  if (prod==='nasledstvo') S.material_nasledstvo=mat;
+  hide('err-mat-'+prod);
+  // For linen, clear color input
+  if (mat==='len') {
+    var cf = document.getElementById('color-'+prod);
+    if (cf) cf.value = '';
+  }
+}
+
+function selectPill(el, group) {
+  document.querySelectorAll('[data-group="'+group+'"]').forEach(function(p){p.classList.remove('selected');});
+  el.classList.add('selected');
+  var val = el.dataset.val||'';
+  var prod = group.replace('-type','');
+  if (prod==='vechen') S.card_type_vechen = val;
+  if (prod==='nasledstvo') S.card_type_nasledstvo = val;
+  var photoId = 'photo-'+prod;
+  if (document.getElementById(photoId)) {
+    document.getElementById(photoId).style.display = val.includes('снимка') ? 'block' : 'none';
+  }
+}
+
+function toggleEngrave(prod, show) {
+  document.getElementById('eng-field-'+prod).classList.toggle('show', show);
+  document.getElementById('eng-'+prod+'-yes').classList.toggle('selected', show);
+  document.getElementById('eng-'+prod+'-no').classList.toggle('selected', !show);
+  if (prod==='n') S.engrave_n=show;
+  if (prod==='vechen') S.engrave_v=show;
+  if (prod==='nasledstvo') S.engrave_nas=show;
+}
+
+async function handleUpload(input, prod) {
+  var prev=document.getElementById('prev-'+prod);
+  if (input.files && input.files[0]) {
+    var file = input.files[0];
+    
+    if (file.size > 50*1024*1024) {
+      prev.style.display='block'; 
+      prev.style.color='var(--er)';
+      prev.textContent='Файлът е твърде голям (максимум 50MB)'; 
+      input.value=''; 
+      return;
+    }
+    
+    prev.style.display='block'; 
+    prev.style.color='var(--go)';
+    prev.textContent='⏳ Качване на файл...';
+    
+    try {
+      const client = window.supabase;
+      if (!client) {
+        throw new Error('Supabase client not initialized');
+      }
+      
+      var timestamp = Date.now();
+      var randomStr = Math.random().toString(36).substring(2, 8);
+      var fileName = prod + '-' + timestamp + '-' + randomStr + '-' + file.name;
+      var filePath = 'photos/' + fileName;
+      
+      const { data, error } = await client.storage
+        .from('order-photos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (error) {
+        console.error('Upload error:', error);
+        prev.style.color='var(--er)';
+        prev.textContent='❌ Грешка: ' + error.message;
+        input.value='';
+        return;
+      }
+      
+      const publicUrl = client.storage
+        .from('order-photos')
+        .getPublicUrl(filePath).data.publicUrl;
+      
+      S['photo_' + prod] = {
+        path: filePath,
+        url: publicUrl
+      };
+      
+      prev.style.color='var(--gd)';
+      prev.innerHTML='✓ <strong>'+file.name+'</strong> - качено успешно';
+      document.getElementById('up-area-'+prod).style.borderColor='var(--gm)';
+      console.log('✅ Photo uploaded:', publicUrl);
+    } catch (err) {
+      console.error('Upload error:', err);
+      prev.style.color='var(--er)';
+      prev.textContent='❌ Грешка: ' + (err.message || 'Unknown error');
+      input.value='';
+    }
+  }
+}
+
+// ── Validate step 3 fields ──
+function validateStep3() {
+  var p = S.product;
+  var ok = true;
+
+  if (p === 'neshen') {
+    // Color required
+    var cv = document.getElementById('color-neshen').value;
+    var colorOk = cv && parseInt(cv) >= 1 && parseInt(cv) <= 13;
+    document.getElementById('color-neshen').classList.toggle('invalid', !colorOk);
+    document.getElementById('err-color-neshen').classList.toggle('show', !colorOk);
+    if (!colorOk) ok = false;
+    // Text required
+    var tv = (document.getElementById('text-neshen').value||'').trim();
+    var textOk = tv.length > 0;
+    document.getElementById('text-neshen').classList.toggle('invalid', !textOk);
+    document.getElementById('err-text-neshen').classList.toggle('show', !textOk);
+    if (!textOk) ok = false;
+  }
+
+  if (p === 'vechen' || p === 'nasledstvo') {
+    // Material required
+    var mat = p==='vechen' ? S.material_vechen : S.material_nasledstvo;
+    var matOk = mat !== '';
+    document.getElementById('err-mat-'+p).classList.toggle('show', !matOk);
+    if (!matOk) ok = false;
+
+    // Color required only for velur
+    if (mat === 'velur') {
+      var cvp = document.getElementById('color-'+p);
+      var errColorEl = document.getElementById('err-color-'+p);
+      if (cvp) {
+        var colorOkP = cvp.value && parseInt(cvp.value) >= 1 && parseInt(cvp.value) <= 13;
+        cvp.classList.toggle('invalid', !colorOkP);
+        if (errColorEl) errColorEl.classList.toggle('show', !colorOkP);
+        if (!colorOkP) ok = false;
+      }
+    }
+
+    // Card type required
+    var cardType = p==='vechen' ? S.card_type_vechen : S.card_type_nasledstvo;
+    var cardTypeOk = cardType && cardType !== '';
+    var errCardType = document.getElementById('err-cardtype-'+p);
+    if (errCardType) errCardType.classList.toggle('show', !cardTypeOk);
+    if (!cardTypeOk) ok = false;
+
+    // Text required
+    var tvp = (document.getElementById('text-'+p).value||'').trim();
+    var textOkP = tvp.length > 0;
+    document.getElementById('text-'+p).classList.toggle('invalid', !textOkP);
+    document.getElementById('err-text-'+p).classList.toggle('show', !textOkP);
+    if (!textOkP) ok = false;
+  }
+
+  return ok;
+}
+
+// ── STEP 4 ──
+function daysDiff(ds) {
+  var s=new Date(ds); s.setHours(0,0,0,0);
+  var n=new Date(); n.setHours(0,0,0,0);
+  return Math.round((s-n)/864e5);
+}
+function onDateChange() {
+  var val=document.getElementById('needed-date').value;
+  var notice=document.getElementById('date-notice');
+  var box=document.getElementById('prem-date-box');
+  document.getElementById('err-4').style.display='none';
+  if (!val) { notice.textContent=''; box.classList.remove('show'); return; }
+  var diff=daysDiff(val);
+  if (diff<1) { notice.style.color='var(--er)'; notice.textContent='Не можете да изберете минала или днешна дата.'; box.classList.remove('show'); S.premDate=null; return; }
+  if (diff<3) {
+    notice.style.color='var(--go)'; notice.textContent='';
+    document.getElementById('days-left').textContent=diff;
+    var ep=fmtPrice(getExpressPrice());
+    document.getElementById('express-price-text').innerHTML=ep;
+    document.getElementById('express-price-btn').innerHTML=ep;
+    box.classList.add('show');
+    document.getElementById('prem-yes').classList.remove('selected');
+    document.getElementById('prem-no').classList.remove('selected');
+    S.premDate=null;
+  } else { notice.textContent=''; box.classList.remove('show'); S.premDate=false; }
+}
+function selectPremDate(yes) {
+  S.premDate=yes;
+  document.getElementById('prem-yes').classList.toggle('selected',yes);
+  document.getElementById('prem-no').classList.toggle('selected',!yes);
+}
+
+
+// ── EEC ──
+function selectEEC(val) {
+  S.eec = val;
+  document.getElementById('eec-yes').classList.toggle('selected', val==='yes');
+  document.getElementById('eec-no').classList.toggle('selected', val==='no');
+  document.getElementById('err-eec').classList.remove('show');
+}
+// ── STEP 5 ──
+function selectCourier(el, name) {
+  document.querySelectorAll('.courier-btn').forEach(function(b){b.classList.remove('selected');});
+  el.classList.add('selected'); S.courier=name; S.selectedOffice=null; S.deliveryType='';
+  document.getElementById('delivery-type-wrap').style.display='block';
+  document.getElementById('del-home').classList.remove('selected');
+  document.getElementById('del-office').classList.remove('selected');
+  document.getElementById('home-addr-wrap').style.display='none';
+  document.getElementById('office-addr-wrap').style.display='none';
+  document.getElementById('office-search').value='';
+  document.getElementById('selected-office-display').textContent='';
+  var lbl = name==='Спиди' ? 'До офис / автомат' : 'До офис';
+  var sub = name==='Спиди' ? 'Офис или Speedy автомат' : 'Вземи от офис на Еконт';
+  document.getElementById('del-office-label').textContent=lbl;
+  document.getElementById('del-office-sub').textContent=sub;
+  document.getElementById('office-label').textContent='Търсете офис на '+name;
+  hide('err-courier'); hide('err-5');
+}
+function selectDeliveryType(type) {
+  S.deliveryType=type;
+  document.getElementById('del-home').classList.toggle('selected',type==='home');
+  document.getElementById('del-office').classList.toggle('selected',type==='office');
+  document.getElementById('home-addr-wrap').style.display=type==='home'?'block':'none';
+  document.getElementById('office-addr-wrap').style.display=type==='office'?'block':'none';
+  hide('err-deltype');
+  if (type==='office') { S.selectedOffice=null; document.getElementById('err-office').classList.remove('show'); }
+}
+var _searchTimer=null;
+
+function renderOfficeResults(list, res) {
+  if (!list || !list.length) {
+    res.innerHTML='<div class="no-results">Не е намерен офис. Опитайте с различни думи.</div>';
+    res.style.display='block';
+    return;
+  }
+  window._officeResults=list;
+  res.innerHTML=list.map(function(o,i){
+    var qtr=o.quarter?'<div class="o-quarter">'+o.quarter+'</div>':'';
+    var typ=o.type?'<span class="o-type-tag">'+o.type+'</span>':'';
+    return '<div class="office-result-item" data-idx="'+i+'"><div class="o-city">'+(o.city||'')+'</div>'+qtr+'<div class="o-addr">'+(o.addr||'')+'</div>'+typ+'</div>';
+  }).join('');
+  res.querySelectorAll('.office-result-item').forEach(function(item){
+    item.addEventListener('click',function(){ pickOffice(window._officeResults[parseInt(item.dataset.idx)]); });
+  });
+  res.style.display='block';
+}
+
+function searchOfficeLocal(q, res) {
+  var list=(OFFICES[S.courier]||[]).filter(function(o){
+    var text=((o.city||'')+' '+(o.quarter||'')+' '+(o.addr||'')).toLowerCase();
+    return q.toLowerCase().split(' ').filter(Boolean).every(function(w){return text.includes(w);});
+  }).slice(0,15);
+  renderOfficeResults(list, res);
+}
+
+async function searchOfficeLive(q, res) {
+  var endpoint = null;
+  if (S.courier === 'Еконт') endpoint='/.netlify/functions/econt-offices';
+  if (S.courier === 'Спиди') endpoint='/.netlify/functions/speedy-offices';
+  if (!endpoint) {
+    searchOfficeLocal(q, res);
+    return;
+  }
+
+  var response = await fetch(endpoint, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({query:q})
+  });
+
+  if (!response.ok) throw new Error('Live office request failed: '+response.status);
+
+  var data = await response.json();
+  var list = Array.isArray(data.offices) ? data.offices : [];
+  if (!list.length) {
+    searchOfficeLocal(q, res);
+    return;
+  }
+  renderOfficeResults(list, res);
+}
+
+function searchOffice() {
+  var q=document.getElementById('office-search').value.trim();
+  var res=document.getElementById('office-results');
+  S.selectedOffice=null;
+  document.getElementById('err-office').classList.remove('show');
+  document.getElementById('selected-office-display').textContent='';
+  if (q.length<2) { res.style.display='none'; return; }
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(function(){
+    searchOfficeLive(q, res).catch(function(){
+      searchOfficeLocal(q, res);
+    });
+  },250);
+}
+function pickOffice(o) {
+  S.selectedOffice=o;
+  var d=(o.city||'')+(o.quarter?', '+o.quarter:'')+', '+(o.addr||'');
+  document.getElementById('office-search').value=d;
+  document.getElementById('office-results').style.display='none';
+  document.getElementById('selected-office-display').innerHTML='✓ '+d;
+  document.getElementById('err-office').classList.remove('show');
+  document.getElementById('office-search').classList.remove('invalid');
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.office-search-wrap'))document.getElementById('office-results').style.display='none';});
+
+// ── VALIDATION ──
+function validateName() {
+  var v=document.getElementById('rec-name').value.trim();
+  var ok=v.split(/ +/).filter(Boolean).length>=2;
+  document.getElementById('rec-name').classList.toggle('invalid',!ok);
+  document.getElementById('err-name').classList.toggle('show',!ok); return ok;
+}
+function validatePhone() {
+  var v=document.getElementById('rec-phone').value.trim().replace(/[\s\-().]/g,'');
+  var ok=/^(\+?3598[789]\d{7}|08[2-9]\d{7}|0\d{8,9}|\+\d{7,15})$/.test(v);
+  document.getElementById('rec-phone').classList.toggle('invalid',!ok);
+  document.getElementById('err-phone').classList.toggle('show',!ok); return ok;
+}
+function validateAddress() {
+  var v = document.getElementById('rec-address').value.trim().toLowerCase();
+  // Must contain at least 3 distinct words (city + quarter + street/block)
+  var words = v.split(/[,\s]+/).filter(Boolean);
+  var ok = words.length >= 3;
+  document.getElementById('rec-address').classList.toggle('invalid',!ok);
+  document.getElementById('err-address').classList.toggle('show',!ok); return ok;
+}
+
+// ── NAVIGATION ──
+function goToStep(n) {
+  if (n > S.step) {
+    if (S.step===1) {
+      var c=document.getElementById('custom-occasion').value.trim();
+      if (!S.occasion&&!c){show('err-1');return;} if(c)S.occasion=c;
+    }
+    if (S.step===2) {
+      if (!S.product){show('err-2');return;}
+      ['neshen','vechen','nasledstvo'].forEach(function(p){
+        document.getElementById('custom-'+p).style.display=(S.product===p)?'block':'none';
+      });
+    }
+    if (S.step===3) {
+      if (!validateStep3()) return;
+      // EEC must be selected
+      if (S.eec === null) {
+        document.getElementById('err-eec').classList.add('show');
+        document.getElementById('eec-section').scrollIntoView({behavior:'smooth',block:'center'});
+        return;
+      }
+    }
+    if (S.step===4) {
+      var dateVal=document.getElementById('needed-date').value;
+      var email=document.getElementById('email').value.trim();
+      var err4=document.getElementById('err-4'); err4.style.display='none';
+      if (!dateVal){err4.textContent='Моля, изберете дата.';err4.style.display='block';return;}
+      var diff=daysDiff(dateVal);
+      if (diff<1){err4.textContent='Датата не може да бъде минала или днешна.';err4.style.display='block';return;}
+      if (diff<3&&S.premDate===null){err4.textContent='Моля, изберете дали желаете Експресна изработка.';err4.style.display='block';return;}
+      if (diff<3&&S.premDate===false){err4.textContent='За дата в рамките на 1–2 дни е необходима Експресна изработка.';err4.style.display='block';return;}
+      if (!email||!email.includes('@')||!email.includes('.')){err4.textContent='Моля, въведете валиден имейл адрес.';err4.style.display='block';return;}
+    }
+  }
+  updateProg(n);
+  document.querySelectorAll('.step-panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('step-'+n).classList.add('active');
+  S.step=n; window.scrollTo({top:0,behavior:'smooth'});
+  if (n===5) buildSummary();
+}
+
+function updateProg(n) {
+  for(var i=1;i<=6;i++){var d=document.getElementById('dot-'+i);d.classList.remove('active','done');if(i<n)d.classList.add('done');if(i===n)d.classList.add('active');}
+  for(var j=1;j<=5;j++)document.getElementById('line-'+j).classList.toggle('done',j<n);
+}
+function buildSummary() {
+  var names={neshen:'Нежен Спомен',vechen:'Вечен Жест',nasledstvo:'Наследство'};
+  var baseStr={neshen:'€17.50',vechen:'€39.50',nasledstvo:'€48.50'};
+  var dateVal=document.getElementById('needed-date').value;
+  var diff=daysDiff(dateVal);
+  var ep=fmtPrice(getExpressPrice());
+  var delInfo=(S.deliveryType==='office'&&S.selectedOffice)?
+    S.courier+' — '+(S.selectedOffice.city||'')+(S.selectedOffice.quarter?', '+S.selectedOffice.quarter:'')+', '+(S.selectedOffice.addr||''):
+    S.courier+' — до адрес';
+  var rows=[{k:'Повод',v:S.occasion},{k:'Продукт',v:names[S.product]+' ('+baseStr[S.product]+')'}];
+  var hasEngrave = (S.product==='neshen'&&S.engrave_n)||(S.product==='vechen'&&S.engrave_v)||(S.product==='nasledstvo'&&S.engrave_nas);
+  if (hasEngrave) {
+    var engId = S.product==='neshen'?'eng-text-n':S.product==='vechen'?'eng-text-vechen':'eng-text-nasledstvo';
+    var engEl = document.getElementById(engId);
+    var engP = (engEl && engEl.value) ? (parseFloat(engEl.options[engEl.selectedIndex].getAttribute('data-price'))||0) : 0;
+    rows.push({k:'Гравиране'+(engEl&&engEl.value?' ('+engEl.value+')':''), v:'+€'+engP.toFixed(2)});
+  }
+  if (diff<3&&S.premDate) rows.push({k:'Експресна изработка',v:'+'+ep});
+  rows.push({k:'Дата',v:dateVal});
+  rows.push({k:'Имейл',v:document.getElementById('email').value});
+  if (S.eec === 'yes') rows.push({k:'Edelweiss Exclusive членство',v:'+€4.99'});
+  document.getElementById('order-summary').innerHTML=
+    rows.map(function(r){return '<div class="summary-row"><span class="summary-key">'+r.k+'</span><span class="summary-val">'+r.v+'</span></div>';}).join('')+
+    '<div class="summary-total-row"><span class="summary-total-key">Общо:</span><span class="summary-total-val">€'+calcTotal()+'</span></div>';
+}
+
+function trySubmit() {
+  // Validate step 5 fields
+  var nm=validateName(), ph=validatePhone(); var addr=true;
+  if (!S.courier){show('err-courier');}
+  if (!S.deliveryType){show('err-deltype');}
+  if (S.deliveryType==='home') addr=validateAddress();
+  if (S.deliveryType==='office'&&!S.selectedOffice){
+    document.getElementById('office-search').classList.add('invalid');
+    document.getElementById('err-office').classList.add('show');
+  }
+  if (!nm||!ph||!S.courier||!S.deliveryType||(S.deliveryType==='home'&&!addr)||(S.deliveryType==='office'&&!S.selectedOffice)){
+    show('err-5'); return;
+  }
+  // Show confirmation modal
+  document.getElementById('confirm-modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('show');
+}
+async function confirmOrder() {
+  document.getElementById('confirm-modal').classList.remove('show');
+
+  var dateVal = document.getElementById('needed-date').value;
+  var totalStr = calcTotal();
+  var totalNum = parseFloat(totalStr) || 0;
+  
+  var orderData = {
+    occasion: S.occasion,
+    product: S.product,
+    card_type: S.product === 'vechen' ? S.card_type_vechen : (S.product === 'nasledstvo' ? S.card_type_nasledstvo : null),
+    text_message: (document.getElementById('text-' + S.product) ? document.getElementById('text-' + S.product).value : '').trim(),
+    color_number: document.getElementById('color-' + S.product) ? document.getElementById('color-' + S.product).value : null,
+    material: S.material_vechen || S.material_nasledstvo || null,
+    needed_date: dateVal,
+    express: S.premDate === true ? true : false,
+    email: document.getElementById('email').value.trim(),
+    recipient_name: document.getElementById('rec-name').value.trim(),
+    recipient_phone: document.getElementById('rec-phone').value.trim(),
+    courier: S.courier,
+    delivery_type: S.deliveryType,
+    delivery_address: S.deliveryType === 'home' ? document.getElementById('rec-address').value.trim() : null,
+    office_city: S.selectedOffice ? (S.selectedOffice.city || null) : null,
+    office_addr: S.selectedOffice ? (S.selectedOffice.addr || null) : null,
+    total_price: totalNum,
+    created_at: new Date().toISOString(),
+    engrave_neshen: S.engrave_n === true ? true : false,
+    engrave_neshen_text: (document.getElementById('eng-text-n') && S.engrave_n === true) ? document.getElementById('eng-text-n').value.trim() : null,
+    engrave_vechen: S.engrave_v === true ? true : false,
+    engrave_vechen_text: (document.getElementById('eng-text-vechen') && S.engrave_v === true) ? document.getElementById('eng-text-vechen').value.trim() : null,
+    engrave_nasledstvo: S.engrave_nas === true ? true : false,
+    engrave_nasledstvo_text: (document.getElementById('eng-text-nasledstvo') && S.engrave_nas === true) ? document.getElementById('eng-text-nasledstvo').value.trim() : null,
+    // Add photo information
+    photo_path: S['photo_' + S.product] ? S['photo_' + S.product].path : null,
+    photo_url: S['photo_' + S.product] ? S['photo_' + S.product].url : null,
+    eec_member: S.eec === 'yes'
+  };
+
+  try {
+    var response = await fetch('https://rjjfqvvrbeetsrnvevyp.supabase.co/functions/v1/insert-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    var result = await response.json();
+
+    if (!response.ok) {
+      var errMsg = result.error || JSON.stringify(result);
+      console.error('=== SUPABASE ERROR ===');
+      console.error('Status:', response.status);
+      console.error('Error:', result);
+      console.error('=======================');
+      alert('Грешка при записване на поръчката:\n\n' + errMsg);
+      return;
+    }
+    
+    console.log('✅ Order submitted successfully:', result);
+  } catch (err) {
+    console.error('=== NETWORK ERROR ===');
+    console.error('Error message:', err.message);
+    console.error('Stack:', err.stack);
+    console.error('=======================');
+    alert('Неуспешна връзка със сървъра: ' + (err.message || err));
+    return;
+  }
+
+  updateProg(6);
+  document.querySelectorAll('.step-panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('step-6').classList.add('active');
+  var eecConf=document.getElementById('eec-confirmation');
+  if(eecConf) eecConf.style.display=(S.eec==='yes')?'block':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function show(id){var el=document.getElementById(id);if(el)el.classList.add('show');}
+function hide(id){var el=document.getElementById(id);if(el)el.classList.remove('show');}
+</script>
+</body>
+</html>
